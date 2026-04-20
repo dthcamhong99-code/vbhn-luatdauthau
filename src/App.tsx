@@ -12,7 +12,8 @@ function DocumentPane({
   searchQuery,
   onSelect,
   onToggleArticle,
-  onClearSearch
+  onClearSearch,
+  isSidebarOpen
 }: {
   docData: DocumentData;
   allArticles: Article[];
@@ -22,6 +23,7 @@ function DocumentPane({
   onSelect: (id: string, articleId?: string) => void;
   onToggleArticle: (id: string) => void;
   onClearSearch: () => void;
+  isSidebarOpen: boolean;
 }) {
   const isLuat = docData.id === 'luat';
   const contentRef = useRef<HTMLDivElement>(null);
@@ -78,7 +80,8 @@ function DocumentPane({
 
   return (
     <div ref={contentRef} className="flex-1 overflow-y-auto p-4 lg:px-10 lg:pt-0 lg:pb-12 scroll-smooth h-full bg-slate-900">
-      <div className="max-w-4xl mx-auto pt-0 pb-20">
+      <div className="w-full h-full pt-0 pb-20 mt-4 px-4 lg:px-0 flex flex-col">
+        <div className={`mx-auto w-full transition-all duration-700 ease-in-out ${isSidebarOpen ? 'max-w-4xl lg:max-w-5xl' : 'max-w-5xl lg:max-w-6xl'}`}>
         {searchQuery.trim() ? (
           /* Search Results */
           <div className="space-y-0">
@@ -128,7 +131,7 @@ function DocumentPane({
                           >
                             <div className="px-5 lg:px-8 pb-8 pt-4 border-t border-ink-900/5">
                               <div className="pr-4">
-                                <p className="text-ink-800 leading-relaxed text-base lg:text-lg whitespace-pre-wrap font-medium selection:bg-deep-yellow/30">
+                                <p className="text-ink-800 leading-relaxed text-base lg:text-lg whitespace-pre-wrap font-medium selection:bg-deep-yellow/30 text-justify">
                                   {highlightMatch(art.content, searchQuery)}
                                 </p>
                               </div>
@@ -148,7 +151,7 @@ function DocumentPane({
                           </motion.div>
                         ) : (
                           <div className="px-5 lg:px-8 pb-6 pt-0">
-                             <div className="text-slate-500 text-sm leading-relaxed line-clamp-2 italic border-l-2 border-slate-100 pl-4 py-1">
+                             <div className="text-slate-500 text-sm leading-relaxed line-clamp-2 italic border-l-2 border-slate-100 pl-4 py-1 text-justify">
                                 {(() => {
                                   const content = art.content;
                                   const query = searchQuery.toLowerCase();
@@ -216,7 +219,7 @@ function DocumentPane({
                       >
                         <div className="px-6 lg:px-10 pb-10 pt-5 border-t border-ink-900/5">
                           <div className="pr-4">
-                            <p className="text-ink-800 leading-relaxed text-sm lg:text-base whitespace-pre-wrap font-medium selection:bg-deep-yellow/30">
+                            <p className="text-ink-800 leading-relaxed text-sm lg:text-base whitespace-pre-wrap font-medium selection:bg-deep-yellow/30 text-justify">
                               {highlightMatch(art.content, searchQuery)}
                             </p>
                           </div>
@@ -244,7 +247,8 @@ function DocumentPane({
         )}
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default function App() {
@@ -338,7 +342,7 @@ export default function App() {
         initial={false}
         animate={{ marginLeft: isSidebarOpen ? 0 : -sidebarWidth }}
         transition={{ duration: isResizing ? 0 : 0.3, ease: 'easeInOut' }}
-        style={{ width: isSidebarOpen ? sidebarWidth : 0 }}
+        style={{ width: sidebarWidth }}
         className={`fixed lg:relative z-50 h-full bg-cream-100 border-r border-ink-900/5 flex flex-col shadow-2xl lg:shadow-none shrink-0 overflow-visible`}
         id="sidebar"
       >
@@ -548,12 +552,12 @@ export default function App() {
           
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={`p-3 bg-white border border-ink-900/5 shadow-sm hover:shadow-md hover:bg-cream-50 rounded-2xl shrink-0 transition-all z-10 relative text-ink-900 ${isSidebarOpen ? 'hidden lg:block' : 'block'}`}
+            className="p-3 bg-white border border-ink-900/5 shadow-sm hover:shadow-md hover:bg-cream-50 rounded-2xl shrink-0 transition-all z-20 text-ink-900"
           >
             <Menu size={24} />
           </button>
 
-          <div className="flex-1 relative max-w-4xl mx-auto flex gap-3 z-10">
+          <div className={`flex-1 relative mx-auto flex gap-3 z-10 transition-all duration-500 ${isSidebarOpen ? 'max-w-4xl' : 'max-w-7xl'}`}>
             <div className="relative flex-1 group">
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-deep-yellow transition-colors" size={20} />
               <input
@@ -588,6 +592,7 @@ export default function App() {
                 onSelect={handleSelectLuat}
                 onToggleArticle={(id) => setExpandedLuatArticleId(prev => prev === id ? null : id)}
                 onClearSearch={() => setSearchQuery("")}
+                isSidebarOpen={isSidebarOpen}
              />
            </div>
         </div>
